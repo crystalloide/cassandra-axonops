@@ -24,7 +24,7 @@ rm -Rf ~/cassandra-axonops
 
 ```bash
 git clone https://github.com/crystalloide/cassandra-axonops.git
-cd cassandra-axonops/01-Cassandra-cluster
+cd cassandra-axonops/01-cassandra-cluster
 ```
 
 ```bash
