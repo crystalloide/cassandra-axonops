@@ -250,7 +250,7 @@ services:
       retries: 10
       start_period: 90s
     depends_on:
-      cassandra-0:
+      cassandra01:
         condition: service_healthy
     restart: unless-stopped
 
@@ -285,7 +285,7 @@ services:
       retries: 10
       start_period: 90s
     depends_on:
-      cassandra-1:
+      cassandra02:
         condition: service_healthy
     restart: unless-stopped
 
