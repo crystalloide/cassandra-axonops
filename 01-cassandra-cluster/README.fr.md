@@ -31,6 +31,9 @@ cd cassandra-axonops/01-cassandra-cluster
 
 ```bash
 cp env.example .env          # set AXONOPS_ORG_NAME
+```
+
+```bash
 docker compose up -d
 docker compose ps            # wait for all services to report healthy
 ```
