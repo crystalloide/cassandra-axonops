@@ -1,4 +1,4 @@
-## Exemple 01 — AxonOps auto-hébergé supervisant un cluster Cassandra de 3 nœuds
+## Exemple 01 : AxonOps auto-hébergé supervisant un cluster Cassandra de 3 nœuds
 
 [English](README.md) | **Français**
 
