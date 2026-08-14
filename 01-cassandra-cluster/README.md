@@ -1,4 +1,4 @@
-# Example 01 — Self-hosted AxonOps monitoring a 3-node Cassandra cluster
+## Example 01 : Self-hosted AxonOps monitoring a 3-node Cassandra cluster
 
 **English** | [Français](README.fr.md)
 
