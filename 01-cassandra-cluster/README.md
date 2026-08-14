@@ -18,12 +18,22 @@ public registry. Start here if you are evaluating AxonOps.
 ## Quick start
 
 ```bash
+cd ~
+rm -Rf ~/cassandra-axonops
+```
+
+```bash
+git clone https://github.com/crystalloide/cassandra-axonops.git
+cd cassandra-axonops/01-cassandra-cluster
+```
+
+```bash
 cp env.example .env          # set AXONOPS_ORG_NAME
 docker compose up -d
 docker compose ps            # wait for all services to report healthy
 ```
 
-Then open <http://localhost:3000> and pick your organisation, then the
+Then open <http://127.0.0.1:3000> and pick your organisation, then the
 `demo-cluster` cluster.
 
 A cold start takes 5–10 minutes: the AxonOps data stores initialise first, then
