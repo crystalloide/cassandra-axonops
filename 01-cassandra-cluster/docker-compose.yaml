@@ -12,7 +12,7 @@
 # Quick start:
 #   cp env.example .env      # set AXONOPS_ORG_NAME
 #   docker compose up -d
-#   open http://localhost:3000
+#   open http://localhost:3000  # try http://127.0.0.1:3000 if you only see 1st screen Axonops and nothing else after
 #
 # Image pinning: every service is pinned to an immutable version tag, with the
 # equivalent SHA256 digest commented above it. Deploy the digest form in
@@ -26,7 +26,8 @@ services:
 
   axondb-timeseries:
     # Preferred (immutable): ghcr.io/axonops/axondb-timeseries@sha256:1ae990a737d36b7c6f8eb92d6d3baf5234e5eae2a4e37fa208acd1108cad934c
-    image: ghcr.io/axonops/axondb-timeseries:5.0.8-1.4.0
+    image: ghcr.io/axonops/axondb-timeseries@sha256:1ae990a737d36b7c6f8eb92d6d3baf5234e5eae2a4e37fa208acd1108cad934c
+    # image: ghcr.io/axonops/axondb-timeseries:5.0.8-1.4.0
     container_name: axondb-timeseries
     hostname: axondb-timeseries
     networks: [axonops]
@@ -56,7 +57,8 @@ services:
 
   axondb-search:
     # Preferred (immutable): ghcr.io/axonops/axondb-search@sha256:a7f2d508a54b3f0d890e70bf0bec1710345ea34696aa0a2bc66c66a0d075f565
-    image: ghcr.io/axonops/axondb-search:3.7.0-1.6.1
+    image: ghcr.io/axonops/axondb-search@sha256:a7f2d508a54b3f0d890e70bf0bec1710345ea34696aa0a2bc66c66a0d075f565
+    # image: ghcr.io/axonops/axondb-search:3.7.0-1.6.1
     container_name: axondb-search
     hostname: axondb-search
     networks: [axonops]
@@ -89,7 +91,8 @@ services:
 
   axon-server:
     # Preferred (immutable): registry.axonops.com/axonops-public/axonops-docker/axon-server@sha256:c75f66727d158bcc3fc033f097f998b05fa1e8f45e3fef600c53fc8c107472e7
-    image: registry.axonops.com/axonops-public/axonops-docker/axon-server:2.0.35
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-server@sha256:c75f66727d158bcc3fc033f097f998b05fa1e8f45e3fef600c53fc8c107472e7
+    #image: registry.axonops.com/axonops-public/axonops-docker/axon-server:2.0.35
     container_name: axon-server
     hostname: axon-server
     networks: [axonops]
@@ -144,7 +147,8 @@ services:
 
   axon-dash:
     # Preferred (immutable): registry.axonops.com/axonops-public/axonops-docker/axon-dash@sha256:7db6b2590b3e65bcf39c2d8a5b76b098c57ef161333b80a488dc32d676dc4362
-    image: registry.axonops.com/axonops-public/axonops-docker/axon-dash:2.0.37
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-dash@sha256:7db6b2590b3e65bcf39c2d8a5b76b098c57ef161333b80a488dc32d676dc4362
+    #image: registry.axonops.com/axonops-public/axonops-docker/axon-dash:2.0.37
     container_name: axon-dash
     hostname: axon-dash
     networks: [axonops]
@@ -177,18 +181,19 @@ services:
   # cold start takes a few minutes.
   # ===========================================================================
 
-  cassandra-0:
+  cassandra01:
     # Preferred (immutable): ghcr.io/axonops/cassandra/cassandra@sha256:98fbf8106234dedadcc8f979a2a879a84b1a48b61118cb90cf22cf6f0e40c77d
-    image: ${CASSANDRA_IMAGE:-ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0}
-    container_name: cassandra-0
-    hostname: cassandra-0
+    image: ghcr.io/axonops/cassandra/cassandra@sha256:98fbf8106234dedadcc8f979a2a879a84b1a48b61118cb90cf22cf6f0e40c77d
+    #image: ${CASSANDRA_IMAGE:-ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0}
+    container_name: cassandra01
+    hostname: cassandra01
     networks: [axonops]
     environment:
       - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-demo-cluster}
-      - CASSANDRA_SEEDS=cassandra-0
+      - CASSANDRA_SEEDS=cassandra01
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=dc1
-      - CASSANDRA_RACK=rack0
+      - CASSANDRA_RACK=rack1
       - CASSANDRA_NUM_TOKENS=16
       - MAX_HEAP_SIZE=${CASSANDRA_HEAP_SIZE:-1G}
       - HEAP_NEWSIZE=${CASSANDRA_HEAP_NEWSIZE:-256M}
@@ -197,7 +202,7 @@ services:
       - AXON_AGENT_SERVER_PORT=1888
       - AXON_AGENT_TLS_MODE=disabled
     volumes:
-      - cassandra-0-data:/var/lib/cassandra
+      - cassandra01-data:/var/lib/cassandra
     ports:
       - "9042:9042"
     healthcheck:
@@ -214,17 +219,18 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  cassandra-1:
-    image: ${CASSANDRA_IMAGE:-ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0}
-    container_name: cassandra-1
-    hostname: cassandra-1
+  cassandra02:
+    image: ghcr.io/axonops/cassandra/cassandra@sha256:98fbf8106234dedadcc8f979a2a879a84b1a48b61118cb90cf22cf6f0e40c77d
+    #image: ${CASSANDRA_IMAGE:-ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0}
+    container_name: cassandra02
+    hostname: cassandra02
     networks: [axonops]
     environment:
       - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-demo-cluster}
-      - CASSANDRA_SEEDS=cassandra-0
+      - CASSANDRA_SEEDS=cassandra01
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=dc1
-      - CASSANDRA_RACK=rack1
+      - CASSANDRA_RACK=rack2
       - CASSANDRA_NUM_TOKENS=16
       - MAX_HEAP_SIZE=${CASSANDRA_HEAP_SIZE:-1G}
       - HEAP_NEWSIZE=${CASSANDRA_HEAP_NEWSIZE:-256M}
@@ -233,7 +239,7 @@ services:
       - AXON_AGENT_SERVER_PORT=1888
       - AXON_AGENT_TLS_MODE=disabled
     volumes:
-      - cassandra-1-data:/var/lib/cassandra
+      - cassandra02-data:/var/lib/cassandra
     healthcheck:
       # The image's own check: Cassandra serving, and the axon-agent alive so
       # the node is really being monitored. A dead agent is reported but not
@@ -248,17 +254,18 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  cassandra-2:
-    image: ${CASSANDRA_IMAGE:-ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0}
+  cassandra03:
+    image: ghcr.io/axonops/cassandra/cassandra@sha256:98fbf8106234dedadcc8f979a2a879a84b1a48b61118cb90cf22cf6f0e40c77d
+    #image: ${CASSANDRA_IMAGE:-ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0}
     container_name: cassandra-2
-    hostname: cassandra-2
+    hostname: cassandra03
     networks: [axonops]
     environment:
       - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-demo-cluster}
-      - CASSANDRA_SEEDS=cassandra-0
+      - CASSANDRA_SEEDS=cassandra01
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=dc1
-      - CASSANDRA_RACK=rack2
+      - CASSANDRA_RACK=rack3
       - CASSANDRA_NUM_TOKENS=16
       - MAX_HEAP_SIZE=${CASSANDRA_HEAP_SIZE:-1G}
       - HEAP_NEWSIZE=${CASSANDRA_HEAP_NEWSIZE:-256M}
@@ -267,7 +274,7 @@ services:
       - AXON_AGENT_SERVER_PORT=1888
       - AXON_AGENT_TLS_MODE=disabled
     volumes:
-      - cassandra-2-data:/var/lib/cassandra
+      - cassandra03-data:/var/lib/cassandra
     healthcheck:
       # The image's own check: Cassandra serving, and the axon-agent alive so
       # the node is really being monitored. A dead agent is reported but not
@@ -292,6 +299,6 @@ volumes:
   axondb-search-data:
   axondb-search-logs:
   axon-server-data:
-  cassandra-0-data:
-  cassandra-1-data:
-  cassandra-2-data:
+  cassandra01-data:
+  cassandra02-data:
+  cassandra03-data:
