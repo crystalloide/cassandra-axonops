@@ -18,16 +18,6 @@ public registry. Start here if you are evaluating AxonOps.
 ## Quick start
 
 ```bash
-cd ~
-rm -Rf ~/cassandra-axonops
-```
-
-```bash
-git clone https://github.com/crystalloide/cassandra-axonops.git
-cd cassandra-axonops/01-cassandra-cluster
-```
-
-```bash
 cp env.example .env          # set AXONOPS_ORG_NAME
 docker compose up -d
 docker compose ps            # wait for all services to report healthy
@@ -47,12 +37,12 @@ the Cassandra nodes bootstrap one at a time.
 | `axondb-search` | `ghcr.io/axonops/axondb-search:3.7.0-1.6.1` | Log and event store (OpenSearch) | — |
 | `axon-server` | `registry.axonops.com/axonops-public/axonops-docker/axon-server:2.0.35` | AxonOps backend and agent endpoint | `1888` |
 | `axon-dash` | `registry.axonops.com/axonops-public/axonops-docker/axon-dash:2.0.37` | Web dashboard | `3000` |
-| `cassandra01` | `ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0` | Monitored cluster, seed node | `9042` |
-| `cassandra02` | `ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0` | Monitored cluster, rack1 | — |
-| `cassandra03` | `ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0` | Monitored cluster, rack2 | — |
+| `cassandra-0` | `ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0` | Monitored cluster, seed node | `9042` |
+| `cassandra-1` | `ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0` | Monitored cluster, rack1 | — |
+| `cassandra-2` | `ghcr.io/axonops/cassandra/cassandra:5.0.8-2.0.31-1.1.0` | Monitored cluster, rack2 | — |
 
-`cassandra01` through `cassandra03` are one datacentre, `dc1`, with one rack
-each. Only `cassandra01` publishes CQL to the host; the other two are reachable
+`cassandra-0` through `cassandra-2` are one datacentre, `dc1`, with one rack
+each. Only `cassandra-0` publishes CQL to the host; the other two are reachable
 inside the compose network and with `docker exec`.
 
 Current tags and digests for every image: [VERSIONS.md](../../VERSIONS.md).
@@ -122,7 +112,7 @@ or drain a node that is still serving. Set `HEALTHCHECK_REQUIRE_AGENT=true` on a
 node to treat it as a failure:
 
 ```bash
-docker compose exec cassandra01 /usr/local/bin/axonops-healthcheck.sh
+docker compose exec cassandra-0 /usr/local/bin/axonops-healthcheck.sh
 ```
 
 The agent starts only once Cassandra is up, so it is normally absent for part of
@@ -139,16 +129,16 @@ the script verifies Cassandra only and the variable has no effect.
 cqlsh 127.0.0.1 9042
 
 # CQL from inside a node, using the bundled cqlai client
-docker compose exec cassandra01 cqlai -e "SELECT release_version FROM system.local;"
+docker compose exec cassandra-0 cqlai -e "SELECT release_version FROM system.local;"
 
 # Ring status
-docker compose exec cassandra01 nodetool status
+docker compose exec cassandra-0 nodetool status
 ```
 
 Write some data so the dashboard has something to show:
 
 ```bash
-docker compose exec cassandra01 cqlai -e "
+docker compose exec cassandra-0 cqlai -e "
   CREATE KEYSPACE IF NOT EXISTS demo
     WITH replication = {'class':'NetworkTopologyStrategy','dc1':3};
   CREATE TABLE IF NOT EXISTS demo.events (
@@ -162,8 +152,8 @@ docker compose exec cassandra01 cqlai -e "
 ```bash
 docker compose ps                       # health of every service
 docker compose logs -f axon-server      # follow one service
-docker compose logs -f cassandra01
-docker compose exec cassandra01 tail -f /var/log/axonops/axon-agent.log
+docker compose logs -f cassandra-0
+docker compose exec cassandra-0 tail -f /var/log/axonops/axon-agent.log
 docker compose down                     # stop, keep data
 docker compose down -v                  # stop and delete all volumes
 ```
@@ -182,12 +172,12 @@ and evaluation stack; production sizing is in the
 ## Troubleshooting
 
 **A Cassandra node never becomes healthy.** Nodes bootstrap one at a time and
-`start_period` is 90s. Watch it with `docker compose logs -f cassandra02`. Out of
+`start_period` is 90s. Watch it with `docker compose logs -f cassandra-1`. Out of
 memory is the usual cause — lower `CASSANDRA_HEAP_SIZE`.
 
 **The cluster does not appear in the dashboard.** The agent and `axon-server`
 must share an organisation. `AXONOPS_ORG_NAME` in `.env` sets both; check with
-`docker compose exec cassandra01 env | grep AXON_AGENT_ORG`.
+`docker compose exec cassandra-0 env | grep AXON_AGENT_ORG`.
 
 **`axon-server` restarts.** It needs both data stores healthy. Check
 `docker compose logs axondb-timeseries axondb-search`, and confirm
