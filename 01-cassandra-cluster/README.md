@@ -129,16 +129,16 @@ the script verifies Cassandra only and the variable has no effect.
 cqlsh 127.0.0.1 9042
 
 # CQL from inside a node, using the bundled cqlai client
-docker compose exec cassandra-0 cqlai -e "SELECT release_version FROM system.local;"
+docker compose exec cassandra01 cqlai -e "SELECT release_version FROM system.local;"
 
 # Ring status
-docker compose exec cassandra-0 nodetool status
+docker compose exec cassandra01 nodetool status
 ```
 
 Write some data so the dashboard has something to show:
 
 ```bash
-docker compose exec cassandra-0 cqlai -e "
+docker compose exec cassandra01 cqlai -e "
   CREATE KEYSPACE IF NOT EXISTS demo
     WITH replication = {'class':'NetworkTopologyStrategy','dc1':3};
   CREATE TABLE IF NOT EXISTS demo.events (
@@ -152,8 +152,8 @@ docker compose exec cassandra-0 cqlai -e "
 ```bash
 docker compose ps                       # health of every service
 docker compose logs -f axon-server      # follow one service
-docker compose logs -f cassandra-0
-docker compose exec cassandra-0 tail -f /var/log/axonops/axon-agent.log
+docker compose logs -f cassandra01
+docker compose exec cassandra01 tail -f /var/log/axonops/axon-agent.log
 docker compose down                     # stop, keep data
 docker compose down -v                  # stop and delete all volumes
 ```
