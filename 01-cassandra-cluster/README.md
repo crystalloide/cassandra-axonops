@@ -18,6 +18,16 @@ public registry. Start here if you are evaluating AxonOps.
 ## Quick start
 
 ```bash
+cd ~
+rm -Rf ~/cassandra-axonops
+```
+
+```bash
+git clone https://github.com/crystalloide/cassandra-axonops.git
+cd cassandra-axonops
+```
+
+```bash
 cp env.example .env          # set AXONOPS_ORG_NAME
 docker compose up -d
 docker compose ps            # wait for all services to report healthy
